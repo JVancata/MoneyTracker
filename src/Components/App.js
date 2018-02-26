@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Inputs from './Components/Inputs';
-import './Css/w3-css.css';
+import Inputs from './Inputs';
+import '../Css/w3-css.css';
 
 class App extends Component {
   state = {
