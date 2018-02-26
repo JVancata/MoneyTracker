@@ -27,14 +27,11 @@ class App extends Component {
     }
   }
 
-  onSave = (event) => {
+  onSave = (inputs) => {
     let { transactions } = this.state;
     let { currentBalance } = this.state;
-    const { inputs } = this.state;
 
-    inputs.amount = parseInt(inputs.amount);
-
-    transactions.push({ description: inputs.description, amount: inputs.amount, add: inputs.add });
+    transactions.push({ "description": inputs.description, "amount": inputs.amount, "add": inputs.add });
 
     inputs.add ? currentBalance += inputs.amount : currentBalance -= inputs.amount;
     this.setState({ transactions, currentBalance });
@@ -73,9 +70,6 @@ class App extends Component {
       </div>
     );
   }
-  saveInputs = (inputs) => {
-    inputs.amount = parseInt(inputs.amount);
-  }
   render() {
     const { transactions } = this.state;
     return (
@@ -84,7 +78,7 @@ class App extends Component {
           <h1>{this.state.currentBalance}</h1>
           <div>{transactions.map((transaction, index) => this.renderTransaction(transaction, index))}</div>
         </div>
-        <Inputs saveInputs={this.saveInputs} />
+        <Inputs saveInputs={this.onSave} />
       </div>
     );
   }

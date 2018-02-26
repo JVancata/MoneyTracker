@@ -13,6 +13,12 @@ class Inputs extends Component {
         event.target.type !== "checkbox" ? inputs[event.target.name] = event.target.value : inputs[event.target.name] = !inputs.add;
         this.setState({ inputs });
     }
+    handleSave = () => {
+        let { inputs } = this.state;
+        inputs.amount = parseInt(inputs.amount);
+        this.props.saveInputs(inputs);
+
+    }
     render() {
         const { transactions } = this.state;
         return (
@@ -28,7 +34,7 @@ class Inputs extends Component {
                     <label>Příjem?</label>
                 </div>
                 <div className="w3-col S12">
-                    <button onClick={this.onSave} className="w3-input w3-black w3-btn">Add</button>
+                    <button onClick={this.handleSave} className="w3-input w3-black w3-btn">Add</button>
                 </div>
             </div>
         );
