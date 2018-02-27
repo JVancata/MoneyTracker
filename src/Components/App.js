@@ -13,7 +13,8 @@ class App extends Component {
       "description": "",
       "amount": "",
       "add": false
-    }
+    },
+    editing: -1
   }
 
   componentWillMount = () => {
@@ -48,8 +49,6 @@ class App extends Component {
     });
   }
   deleteTransaction = (index) => {
-    console.log(index);
-
     let { transactions, currentBalance } = this.state;
     transactions[index].add ? currentBalance -= transactions[index].amount : currentBalance += transactions[index].amount;
     transactions.splice(index, 1);
@@ -57,12 +56,17 @@ class App extends Component {
     this.saveTransactions(transactions);
     this.setState({ transactions, currentBalance });
   }
+  toggleEdit = (index) => {
+    this.setState({ editing: index });
+  }
   saveTransactions = (transactions) => {
     localStorage.transactions = JSON.stringify(transactions);
   }
   renderTransaction = (transaction, index) => {
+    let editing = index === this.state.editing ? true : false;
+    console.log(editing);
     return (
-      <Transaction deleteTransaction={this.deleteTransaction} transaction={transaction} index={index} />
+      <Transaction deleteTransaction={this.deleteTransaction} transaction={transaction} index={index} key={index} editing={editing} toggleEdit={this.toggleEdit} />
     );
   }
   render() {
