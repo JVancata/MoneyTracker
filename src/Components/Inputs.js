@@ -17,10 +17,8 @@ class Inputs extends Component {
         let { inputs } = this.state;
         inputs.amount = parseInt(inputs.amount);
         this.props.saveInputs(inputs);
-
     }
     render() {
-        const { transactions } = this.state;
         return (
             <div name="inputs" className="w3-row w3-padding-small">
                 <div className="w3-col s6">

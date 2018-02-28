@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import Inputs from './Inputs';
 import Transaction from './Transaction';
 import '../Css/w3-css.css';
+import '../Css/fontawesome';
 
 class App extends Component {
   state = {
-    currentBalance: 100,
+    currentBalance: 0,
     transactions: [
       //{description: "Nic", amount: 0, add: true} true = +, false = -
     ],
@@ -18,8 +19,13 @@ class App extends Component {
   }
 
   componentWillMount = () => {
+    this.calculateCurrentBalance();
+  }
+
+  calculateCurrentBalance = () => {
     let transactions;
     let currentBalance = 0;
+
     if (localStorage.transactions) {
       transactions = JSON.parse(localStorage.transactions);
       transactions.forEach(transaction => {
@@ -38,7 +44,6 @@ class App extends Component {
     inputs.add ? currentBalance += inputs.amount : currentBalance -= inputs.amount;
     this.setState({ transactions, currentBalance });
     this.saveTransactions(transactions);
-    console.log(this.state.transactions);
   }
 
   onChange = (event) => {
@@ -48,6 +53,15 @@ class App extends Component {
       inputs
     });
   }
+
+  toggleEdit = (index) => {
+    this.setState({ editing: index });
+  }
+
+  saveTransactions = (transactions) => {
+    localStorage.transactions = JSON.stringify(transactions);
+  }
+
   deleteTransaction = (index) => {
     let { transactions, currentBalance } = this.state;
     transactions[index].add ? currentBalance -= transactions[index].amount : currentBalance += transactions[index].amount;
@@ -56,17 +70,20 @@ class App extends Component {
     this.saveTransactions(transactions);
     this.setState({ transactions, currentBalance });
   }
-  toggleEdit = (index) => {
-    this.setState({ editing: index });
+
+  updateTransaction = (index, transaction) => {
+    let { transactions } = this.state;
+    transactions[index] = transaction;
+    this.saveTransactions(transactions);
+    this.setState({ transactions });
+    this.calculateCurrentBalance();
+
   }
-  saveTransactions = (transactions) => {
-    localStorage.transactions = JSON.stringify(transactions);
-  }
+  
   renderTransaction = (transaction, index) => {
     let editing = index === this.state.editing ? true : false;
-    console.log(editing);
     return (
-      <Transaction deleteTransaction={this.deleteTransaction} transaction={transaction} index={index} key={index} editing={editing} toggleEdit={this.toggleEdit} />
+      <Transaction deleteTransaction={this.deleteTransaction} updateTransaction={this.updateTransaction} transaction={transaction} index={index} key={index} editing={editing} toggleEdit={this.toggleEdit} />
     );
   }
   render() {
