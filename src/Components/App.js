@@ -1,78 +1,43 @@
 import React, { Component } from 'react';
 import Inputs from './Inputs';
 import Transaction from './Transaction';
-import '../Css/w3-css.css';
+import '../css/w3-css.css';
 // eslint-disable-next-line
-import '../Css/fontawesome';
+import '../css/fontawesome';
+
+import { loadTransactions } from '../redux/modules/transactions';
+
+import { connect } from 'react-redux';
+//import PropTypes from 'prop-types';
+//import history from '../../history/history';
+
 
 class App extends Component {
+  months = ["Ledena", "Února", "Březena", "Apríla", "Mája", "Června", "Červenca", "Srpna", "Zářía", "Října", "Listí padá", "Prosinec"];
   state = {
     currentBalance: 0,
-    transactions: {
-      0: {
-        transactions: []
-      },
-      1: {
-        transactions: []
-      },
-      2: {
-        transactions: []
-      },
-      3: {
-        transactions: []
-      },
-      4: {
-        transactions: []
-      },
-      5: {
-        transactions: []
-      },
-      6: {
-        transactions: []
-      },
-      7: {
-        transactions: []
-      },
-      8: {
-        transactions: []
-      },
-      9: {
-        transactions: []
-      },
-      10: {
-        transactions: []
-      },
-      11: {
-        transactions: []
-      }
-      //{description: "Nic", amount: 0, add: true} true = +, false = -
-    },
-    currentMonth: 2,
-    inputs: {
-      "description": "",
-      "amount": "",
-      "add": false
-    },
     editing: -1
   }
 
+  constructor(props) {
+    super(props);
+    this.props.loadTransactions(this.props.transactions.userId);
+  }
+
   componentWillMount = () => {
+
     this.calculateCurrentBalance();
   }
 
   calculateCurrentBalance = () => {
-    var transactions;
+    /*var transactions;
     let currentBalance = 0;
 
     if (localStorage.transactions) {
       transactions = JSON.parse(localStorage.transactions);
       console.log(transactions)
       for (let month = 0; month < 12; month++) {
-        console.log(transactions[month])
-        console.log("hh")
-
         if (transactions[month]) {
-          console.log("je")
           transactions[month].transactions.forEach(transaction => {
             transaction.add ? currentBalance += transaction.amount : currentBalance -= transaction.amount;
           });
@@ -80,25 +45,13 @@ class App extends Component {
       }
 
       this.setState({ transactions, currentBalance });
-    }
+    }*/
   }
 
   onSave = (inputs) => {
     let { transactions, currentBalance, currentMonth } = this.state;
 
-    transactions[currentMonth].transactions.push({ "description": inputs.description, "amount": Math.abs(inputs.amount), "add": inputs.add });
 
-    inputs.add ? currentBalance += inputs.amount : currentBalance -= inputs.amount;
-    this.setState({ transactions, currentBalance });
-    this.saveTransactions(transactions);
-  }
-
-  onChange = (event) => {
-    let { inputs } = this.state;
-    event.target.type !== "checkbox" ? inputs[event.target.name] = event.target.value : inputs[event.target.name] = !inputs.add;
-    this.setState({
-      inputs
-    });
   }
 
   toggleEdit = (index) => {
@@ -128,10 +81,9 @@ class App extends Component {
 
   renderTransaction = (transaction, index) => {
     let editing = index === this.state.editing ? true : false;
+
     return (
       <Transaction
-        deleteTransaction={this.deleteTransaction}
-        updateTransaction={this.updateTransaction}
         transaction={transaction}
         index={index}
         key={index}
@@ -142,21 +94,29 @@ class App extends Component {
   }
   changeCurrentMonth = (change) => {
     change < 0 ? change = 0 : change > 11 ? change = 11 : null;
-    this.setState({ currentMonth: change });
+    this.setState({ currentMonth: change, editing: -1 });
   }
   render() {
-    const { transactions, currentMonth } = this.state;
+    console.log("props", this.props)
+    const { transactions, currentMonth } = this.props.transactions;
+    //console.log("transactions", transactions);
     return (
       <div className="w3-content w3-row">
         <div className="w3-row w3-padding">
-          <button class="w3-button w3-black" onClick={() => { this.changeCurrentMonth(currentMonth - 1) }}>Right</button><span>{currentMonth}</span><button onClick={() => { this.changeCurrentMonth(currentMonth + 1) }} class="w3-button w3-black">Left</button>
+          <button className="w3-button w3-black" onClick={() => { this.changeCurrentMonth(currentMonth - 1) }}>Right</button>
+          <span>{this.months[currentMonth]}</span>
+          <button onClick={() => { this.changeCurrentMonth(currentMonth + 1) }} className="w3-button w3-black">Left</button>
           <h1>{this.state.currentBalance}</h1>
-          {transactions[currentMonth] && <div>{transactions[currentMonth].transactions.map((transaction, index) => this.renderTransaction(transaction, index))}</div>}
+          <div>{transactions.map((transaction, index) => this.renderTransaction(transaction, index))}</div>
         </div>
-        <Inputs saveInputs={this.onSave} />
+        <Inputs />
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  transactions: state.transactions,
+});
+
+export default connect(mapStateToProps, { loadTransactions })(App);
