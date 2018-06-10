@@ -8,10 +8,6 @@ class Inputs extends Component {
         "amount": "",
         "add": false
     }
-    constructor(props) {
-        super(props);
-
-    }
     onChange = (event) => {
 
         switch (event.target.name) {
@@ -31,7 +27,9 @@ class Inputs extends Component {
     }
     handleSave = () => {
         const { description, amount, add } = this.state;
-        this.props.addTransaction({ transaction: { description, amount: parseInt(amount), add }, userId: this.props.transactions.userId });
+        if (description.length <= 0) return;
+        if (!(parseInt(amount) >= 0)) return;
+        this.props.addTransaction({ transaction: { description, amount: parseInt(amount), add, month: this.props.transactions.currentMonth }, userId: this.props.transactions.userId });
     }
     render() {
         const { description, amount, add } = this.state;
@@ -55,8 +53,6 @@ class Inputs extends Component {
         );
     }
 }
-
-
 
 const mapStateToProps = (state) => ({
     transactions: state.transactions

@@ -1,7 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var mongojs = require('mongojs')
-var db = mongojs('mongodb://localhost:27017/money', ['transakce'])
+const express = require('express');
+const router = express.Router();
+const mongojs = require('mongojs')
+const db = mongojs('mongodb://localhost:27017/money', ['transakce'])
+const ObjectId = mongojs.ObjectId;
 /*var massive = {
   user: "xd",
   transactions: {
@@ -63,12 +64,30 @@ router.post('/insert', function (req, res, next) {
   });
 });
 
+router.post('/delete', function (req, res, next) {
+  const { userId, _id } = req.body;
+  console.log(userId, _id)
+  db.transakce.remove({ _id: ObjectId(_id), userId: { $eq: userId } }, (err, data) => {
+    if (err) { console.log(err); }
+    res.json({ msg: "deleted" });
+  });
+});
+
+router.post('/update', function (req, res, next) {
+  let { userId, transaction } = req.body;
+  if (!transaction.offline) delete transaction.offline;
+  const { description, month, amount, add } = transaction;
+  db.transakce.update({ _id: ObjectId(transaction._id), userId: { $eq: userId } }, { userId: userId, description: description, month: month, amount: amount, add: add }, (err, data) => {
+    if (err) { console.log(err); }
+    res.json({ msg: "updated" });
+  });
+});
+
 router.post('/get', function (req, res, next) {
   const { userId } = req.body;
   console.log("chceš transakce s ID %s jo?", userId);
 
   db.transakce.find({ userId: { $eq: userId } }, (err, docs) => {
-    console.log(docs);
     res.json(docs);
   });
 });
